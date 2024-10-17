@@ -2,6 +2,7 @@ package br.com.julio.api.services;
 
 import br.com.julio.api.domain.User;
 import br.com.julio.api.repositories.UserRepository;
+import br.com.julio.api.services.exceptions.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,6 @@ public class UserService {
 
     public User findById(Integer id) {
         Optional<User> user = repository.findById(id);
-        return user.orElse(null);
+        return user.orElseThrow(() -> new ObjectNotFoundException("Objeto não encontrado"));
     }
 }
