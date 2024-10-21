@@ -3,6 +3,7 @@ package br.com.julio.api.services;
 import br.com.julio.api.domain.User;
 import br.com.julio.api.domain.dto.UserDTO;
 import br.com.julio.api.repositories.UserRepository;
+import br.com.julio.api.services.exceptions.DataIntegratyViolationException;
 import br.com.julio.api.services.exceptions.ObjectNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,8 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -29,6 +29,7 @@ class UserServiceTest {
     private static final String EMAIL                    = "julio@gmail.com";
     private static final String SENHA                    = "123";
     private static final String OBJETO_NAO_ENCONTRADO    = "Objeto não encontrado";
+    private static final String EMAIL_JA_CADASTRADO      = "E-mail ja cadastrado no sistema";
 
     @InjectMocks
     private UserService service;
@@ -100,6 +101,19 @@ class UserServiceTest {
         assertEquals(NAME, response.getName());
         assertEquals(EMAIL, response.getEmail());
         assertEquals(SENHA, response.getPassword());
+    }
+
+    @Test
+    void quandoCreateEntaoRetorneDataIntegrityViolationException() {
+        when(repository.findByEmail(anyString())).thenReturn(userOptional);
+
+        try{
+            userOptional.get().setId(2);
+            service.create(userDTO);
+        } catch (Exception ex) {
+            assertEquals(DataIntegratyViolationException.class, ex.getClass());
+            assertEquals(EMAIL_JA_CADASTRADO, ex.getMessage());
+        }
     }
 
     @Test
