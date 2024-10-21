@@ -3,6 +3,7 @@ package br.com.julio.api.services;
 import br.com.julio.api.domain.User;
 import br.com.julio.api.domain.dto.UserDTO;
 import br.com.julio.api.repositories.UserRepository;
+import br.com.julio.api.services.exceptions.ObjectNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -55,6 +56,18 @@ class UserServiceTest {
         assertEquals(ID, response.getId());
         assertEquals(NAME, response.getName());
         assertEquals(EMAIL, response.getEmail());
+    }
+
+    @Test
+    void quandoFindByIdEntaoRetorneObjectNotFoundException() {
+        when(repository.findById(anyInt())).thenThrow(new ObjectNotFoundException("Objeto não encontrado"));
+
+        try{
+            repository.findById(ID);
+        } catch (Exception ex) {
+            assertEquals(ObjectNotFoundException.class, ex.getClass());
+            assertEquals("Objeto não encontrado", ex.getMessage());
+        }
     }
 
     @Test
