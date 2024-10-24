@@ -1,5 +1,6 @@
 package br.com.julio.api.resources.exceptions;
 
+import br.com.julio.api.services.exceptions.DataIntegratyViolationException;
 import br.com.julio.api.services.exceptions.ObjectNotFoundException;
 import org.apache.coyote.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +45,17 @@ class ResourceExceptionHandlerTest {
     }
 
     @Test
-    void dataIntegrityViolation() {
+    void quandoDataIntegrityViolationRetornaUmResponseEntity() {
+        ResponseEntity<StandardError> response = exceptionHandler
+                .dataIntegrityViolation(new DataIntegratyViolationException(EMAIL_JA_CADASTRADO),
+                        new MockHttpServletRequest());
+
+        assertNotNull(response);
+        assertNotNull(response.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(ResponseEntity.class, response.getClass());
+        assertEquals(StandardError.class, response.getBody().getClass());
+        assertEquals(EMAIL_JA_CADASTRADO, response.getBody().getError());
+        assertEquals(400, response.getBody().getStatus());
     }
 }
